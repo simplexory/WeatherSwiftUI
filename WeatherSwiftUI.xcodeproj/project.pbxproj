@@ -51,8 +51,13 @@
 		BB1413742A95388B006F49F7 /* WeatherSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				BB1413892A954576006F49F7 /* Enums */,
+				BB1413862A954464006F49F7 /* API */,
+				BB1413852A95441C006F49F7 /* Views */,
+				BB1413842A95440B006F49F7 /* ViewModel */,
+				BB1413832A954405006F49F7 /* Model */,
+				BB1413872A9544B2006F49F7 /* Extension */,
 				BB1413752A95388B006F49F7 /* WeatherSwiftUIApp.swift */,
-				BB1413772A95388B006F49F7 /* ContentView.swift */,
 				BB1413792A95388D006F49F7 /* Assets.xcassets */,
 				BB14137B2A95388D006F49F7 /* Preview Content */,
 			);
@@ -65,6 +70,57 @@
 				BB14137C2A95388D006F49F7 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		BB1413832A954405006F49F7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		BB1413842A95440B006F49F7 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		BB1413852A95441C006F49F7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BB1413882A954547006F49F7 /* Reusable */,
+				BB1413772A95388B006F49F7 /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BB1413862A954464006F49F7 /* API */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		BB1413872A9544B2006F49F7 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		BB1413882A954547006F49F7 /* Reusable */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Reusable;
+			sourceTree = "<group>";
+		};
+		BB1413892A954576006F49F7 /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Enums;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
