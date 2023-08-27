@@ -23,17 +23,17 @@ final class WeatherViewModel: ObservableObject {
     
     init() {
         switch locationDataManager.locationManager.authorizationStatus {
-        case .authorizedWhenInUse:  // Location services are available.
+        case .authorizedWhenInUse:
             guard let location = locationDataManager.locationManager.location else { return }
             
             loadData(method: .coordinate(
                 location.coordinate.latitude,
                 location.coordinate.longitude
             ))
-        case .restricted, .denied:  // Location services currently unavailable.
-            print("Current location data was restricted or denied.")
-        case .notDetermined:        // Authorization not determined yet.
-            print("Finding location...")
+        case .restricted, .denied:
+            self.error = LocationError.locationDenied
+        case .notDetermined:
+            self.error = LocationError.locationNotDetermined
         default: break
         }
     }

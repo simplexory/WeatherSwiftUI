@@ -27,6 +27,7 @@ struct WelcomeView_Previews: PreviewProvider {
                 
                 WelcomeView().environmentObject({ () -> WeatherViewModel in
                     let viewModel = WeatherViewModel(mock: true)
+                    viewModel.locationDataManager.authorizationStatus = .authorizedWhenInUse
                     viewModel.observedWeather = Weather(
                         mockCurrentWeather: previewCurrentWeather,
                         mockDailyWeather: previewDailyWeather
