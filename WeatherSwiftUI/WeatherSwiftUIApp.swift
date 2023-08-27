@@ -13,8 +13,9 @@ struct WeatherSwiftUIApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WelcomeView()
                 .environmentObject(viewModel)
+                .preferredColorScheme(.dark)
         }
     }
 }

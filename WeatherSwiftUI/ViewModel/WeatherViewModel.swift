@@ -10,8 +10,10 @@ import CoreLocation
 
 @MainActor
 final class WeatherViewModel: ObservableObject {
+    @Published var locationDataManager = LocationDataManager()
     @Published var citiesWeather = [String: Weather]()
-    @Published var userWeather: Weather?
+    @Published var observedWeather: Weather?
+    @Published var error: Error?
     
     var cities = [String]()
     private let apiKey = "66252e3de78861371fa91da79b0a1090"
@@ -20,9 +22,23 @@ final class WeatherViewModel: ObservableObject {
     private let forecastURL = "/forecast"
     
     init() {
-        let coordinates = CLLocationCoordinate2D(latitude: 55.1927, longitude: 30.2064)
-        loadData(method: .coordinate(coordinates.latitude, coordinates.longitude))
+        switch locationDataManager.locationManager.authorizationStatus {
+        case .authorizedWhenInUse:  // Location services are available.
+            guard let location = locationDataManager.locationManager.location else { return }
+            
+            loadData(method: .coordinate(
+                location.coordinate.latitude,
+                location.coordinate.longitude
+            ))
+        case .restricted, .denied:  // Location services currently unavailable.
+            print("Current location data was restricted or denied.")
+        case .notDetermined:        // Authorization not determined yet.
+            print("Finding location...")
+        default: break
+        }
     }
+    
+    init(mock: Bool = true) {}
 }
 
 extension WeatherViewModel {
@@ -33,15 +49,16 @@ extension WeatherViewModel {
                 guard let _ = citiesWeather[city] else { return }
                 do {
                     let weather = try await requestWeather(method: method)
+                    self.observedWeather = weather
                     self.citiesWeather[city] = weather
                 } catch {
-                    throw WeatherFetchError.serverError
+                    self.error = error // ?????????
                 }
             case .coordinate:
                 do {
-                    self.userWeather = try await requestWeather(method: method)
+                    self.observedWeather = try await requestWeather(method: method)
                 } catch {
-                    throw WeatherFetchError.serverError
+                    self.error = error //  ?????? need test
                 }
             }
         }
@@ -50,15 +67,16 @@ extension WeatherViewModel {
 
 extension WeatherViewModel {
     func getCurrentWeather(method: WeatherReqestMethod) async throws -> CurrentWeather {
-        var url: URL
+        var urlString: String
         
         switch method {
         case .city(let city):
-            url = URL(string: "\(baseURL)\(weatherURL)?q=\(city)&appid=\(apiKey)&units=metric")!
+            urlString = "\(baseURL)\(weatherURL)?q=\(city)&appid=\(apiKey)&units=metric"
         case .coordinate(let lat, let lon):
-            url = URL(string: "\(baseURL)\(weatherURL)?lat=\(lat)&lon=\(lon)&appid=\(apiKey)&units=metric")!
+            urlString = "\(baseURL)\(weatherURL)?lat=\(lat)&lon=\(lon)&appid=\(apiKey)&units=metric"
         }
         
+        guard let url = URL(string: urlString) else { throw WeatherFetchError.invalidURL }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw WeatherFetchError.serverError }
         guard let currentWeather = try? JSONDecoder().decode(CurrentWeather.self, from: data) else { throw WeatherFetchError.invalidData }
@@ -66,22 +84,23 @@ extension WeatherViewModel {
     }
     
     func getDailyForecast(method: WeatherReqestMethod) async throws -> DailyWeather {
-        var url: URL
+        var urlString: String
         
         switch method {
         case .city(let city):
-            url = URL(string: "\(baseURL)\(forecastURL)?q=\(city)&appid=\(apiKey)&units=metric")!
+            urlString = "\(baseURL)\(forecastURL)?q=\(city)&appid=\(apiKey)&units=metric"
         case .coordinate(let lat, let lon):
-            url = URL(string: "\(baseURL)\(forecastURL)?lat=\(lat)&lon=\(lon)&appid=\(apiKey)&units=metric")!
+            urlString = "\(baseURL)\(forecastURL)?lat=\(lat)&lon=\(lon)&appid=\(apiKey)&units=metric"
         }
         
+        guard let url = URL(string: urlString) else { throw WeatherFetchError.invalidURL }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw WeatherFetchError.serverError }
         guard let dailyWeather = try? JSONDecoder().decode(DailyWeather.self, from: data) else { throw WeatherFetchError.invalidData }
         return dailyWeather
     }
     
-    func requestWeather(method: WeatherReqestMethod) async throws -> Weather {
+    func requestWeather(method: WeatherReqestMethod) async throws -> Weather? {
         return try await withThrowingTaskGroup(of: WeatherFetchType.self) { group -> Weather in
             
             group.addTask {
@@ -93,7 +112,7 @@ extension WeatherViewModel {
                 let dailyForecast = try await self.getDailyForecast(method: method)
                 return .daily(dailyForecast)
             }
-        
+            
             var dailyForecast: DailyWeather?
             var currentWeather: CurrentWeather?
             
@@ -114,7 +133,6 @@ extension WeatherViewModel {
             }
             
             let weather = try Weather(currentWeather: currentWeather, dailyWeather: dailyForecast)
-            print(weather)
             return weather
         }
     }

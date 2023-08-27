@@ -10,7 +10,7 @@ import Foundation
 struct Weather: Codable {
     var city: String?
     var forecast: [CompleteWeatherListItem]?
-    var currentWeather: CompleteCurrentWeatherItem?
+    var current: CompleteCurrentWeatherItem?
     
     var error: Bool = false
     var errorCode: Int?
@@ -21,7 +21,7 @@ struct Weather: Codable {
             self.errorCode = currentWeatherError
             return
         }else {
-            self.currentWeather = try CompleteCurrentWeatherItem(currentWeather: currentWeather)
+            self.current = try CompleteCurrentWeatherItem(currentWeather: currentWeather)
             self.city = currentWeather.name
         }
         
@@ -39,15 +39,26 @@ struct Weather: Codable {
             
         }
     }
+    
+    init(mockCurrentWeather: CurrentWeather, mockDailyWeather: DailyWeather) {
+        self.current = CompleteCurrentWeatherItem(mockCurrentWeather: mockCurrentWeather)
+        self.city = mockCurrentWeather.name
+        self.forecast = []
+        for dw in mockDailyWeather.list! {
+            self.forecast?.append(CompleteWeatherListItem(mockDailyWeatherItem: dw))
+        }
+    }
 }
 
 struct CompleteCurrentWeatherItem: Codable {
     let timestamp: Date
     let condition: String
-    let temperature: Double
-    let minTemperature: Double
-    let maxTemperature: Double
+    let temperature: Temperature
+    let minTemperature: Temperature
+    let maxTemperature: Temperature
     let icon: String
+    
+    var url: URL { URL(string: "https://openweathermap.org/img/wn/\(icon)@2x.png")! }
     
     init(currentWeather: CurrentWeather) throws {
         guard let currentWeatherStrings = currentWeather.weather?.first,
@@ -58,9 +69,21 @@ struct CompleteCurrentWeatherItem: Codable {
         
         self.timestamp = Date()
         self.condition = currentWeatherStrings.description
-        self.temperature = currentMainStrings.temp
-        self.minTemperature = currentMainStrings.temp_min
-        self.maxTemperature = currentMainStrings.temp_max
+        self.temperature = Temperature.C(Int(currentMainStrings.temp))
+        self.minTemperature = Temperature.C(Int(currentMainStrings.temp_min))
+        self.maxTemperature = Temperature.C(Int(currentMainStrings.temp_max))
+        self.icon = currentWeatherStrings.icon
+    }
+    
+    init(mockCurrentWeather: CurrentWeather) {
+        let currentWeatherStrings = mockCurrentWeather.weather!.first!
+        let currentMainStrings = mockCurrentWeather.main!
+        
+        self.timestamp = Date()
+        self.condition = currentWeatherStrings.description
+        self.temperature = Temperature.C(Int(currentMainStrings.temp))
+        self.minTemperature = Temperature.C(Int(currentMainStrings.temp_min))
+        self.maxTemperature = Temperature.C(Int(currentMainStrings.temp_max))
         self.icon = currentWeatherStrings.icon
     }
 }
@@ -70,7 +93,9 @@ struct CompleteWeatherListItem: Codable {
     let condition: String
     let description: String
     let icon: String
-    let temperature: Double
+    let temperature: Temperature
+    
+    var url: URL { URL(string: "https://openweathermap.org/img/wn/\(icon)@2x.png")! }
     
     init(dailyWeatherItem: DailyWeatherItem) throws {
         self.timestamp = dailyWeatherItem.dt
@@ -85,7 +110,19 @@ struct CompleteWeatherListItem: Codable {
         self.condition = dailyWeatherStrings.main
         self.description = dailyWeatherStrings.description
         self.icon = dailyWeatherStrings.icon
-        self.temperature = dailyWeatherTemperature.temp
+        self.temperature = Temperature.C(Int(dailyWeatherTemperature.temp))
+    }
+    
+    init(mockDailyWeatherItem: DailyWeatherItem) {
+        self.timestamp = mockDailyWeatherItem.dt
+
+        let dailyWeatherStrings = mockDailyWeatherItem.weather!.first!
+        let dailyWeatherTemperature = mockDailyWeatherItem.main!
+        
+        self.condition = dailyWeatherStrings.main
+        self.description = dailyWeatherStrings.description
+        self.icon = dailyWeatherStrings.icon
+        self.temperature = Temperature.C(Int(dailyWeatherTemperature.temp))
     }
 }
 
