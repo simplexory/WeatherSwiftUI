@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CityView: View {
+    @StateObject var viewModel: CityView.ViewModel
+    
     var body: some View {
         ZStack {
             Rectangle()
@@ -16,22 +18,22 @@ struct CityView: View {
             
             HStack(alignment: .top) {
                 VStack(alignment: .leading) {
-                    Text("My Location")
+                    Text(viewModel.name)
                         .font(.title)
                         .bold()
-                    Text("21:10")
+                    Text(viewModel.time)
                         .bold()
                     
                     Spacer()
                     
-                    Text("Conddition")
+                    Text(viewModel.condition)
                         .bold()
                 }
                 
                 Spacer()
                 
                 VStack(alignment: .trailing) {
-                    Text(Temperature.C(21).celsiusString)
+                    Text(viewModel.temperature.celsiusString)
                         .font(.system(size: 60))
                         .fontDesign(.monospaced)
                         .bold()
@@ -39,10 +41,10 @@ struct CityView: View {
                     Spacer()
                     
                     HStack {
-                        Text("H:\(Temperature.C(22).celsiusString)")
+                        Text("H:\(viewModel.maxTemp.celsiusString)")
                             .fontDesign(.monospaced)
                             .bold()
-                        Text("L:\(Temperature.C(13).celsiusString)")
+                        Text("L:\(viewModel.minTemp.celsiusString)")
                             .fontDesign(.monospaced)
                             .bold()
                     }
@@ -57,7 +59,40 @@ struct CityView: View {
 
 struct CityView_Previews: PreviewProvider {
     static var previews: some View {
-        CityView()
+        CityView(viewModel: .mockData)
             .preferredColorScheme(.dark)
+    }
+}
+
+extension CityView {
+    class ViewModel: ObservableObject {
+        let name: String
+        let time: String
+        let temperature: Temperature
+        let minTemp: Temperature
+        let maxTemp: Temperature
+        let condition: String
+        
+        init(name: String, time: String, temperature: Temperature, minTemp: Temperature, maxTemp: Temperature, condition: String) {
+            self.name = name
+            self.time = time
+            self.temperature = temperature
+            self.minTemp = minTemp
+            self.maxTemp = maxTemp
+            self.condition = condition
+        }
+    }
+}
+
+extension CityView.ViewModel {
+    static var mockData: CityView.ViewModel {
+        return CityView.ViewModel(
+            name: "Paris",
+            time: "21:22",
+            temperature: .C(21),
+            minTemp: .C(17),
+            maxTemp: .C(25),
+            condition: "Good weather"
+        )
     }
 }

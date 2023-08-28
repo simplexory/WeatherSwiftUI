@@ -14,22 +14,20 @@ final class WeatherViewModel: ObservableObject {
     @Published var citiesWeather = [String: Weather]()
     @Published var observedWeather: Weather?
     @Published var error: Error?
+    @Published var userWeather: Weather?
     
-    var cities = [String]()
+    var cities: [String] = ["Moscow", "Paris", "Vitebsk"]
     private let apiKey = "66252e3de78861371fa91da79b0a1090"
     private let baseURL = "https://api.openweathermap.org/data/2.5"
     private let weatherURL = "/weather"
     private let forecastURL = "/forecast"
     
     init() {
+        loadSavedCities()
+        
         switch locationDataManager.locationManager.authorizationStatus {
         case .authorizedWhenInUse:
-            guard let location = locationDataManager.locationManager.location else { return }
-            
-            loadData(method: .coordinate(
-                location.coordinate.latitude,
-                location.coordinate.longitude
-            ))
+            loadUserWeather(makeObserved: true)
         case .restricted, .denied:
             self.error = LocationError.locationDenied
         case .notDetermined:
@@ -43,7 +41,12 @@ final class WeatherViewModel: ObservableObject {
     func handleRefresh() {
         guard let city = observedWeather?.city else { return }
         observedWeather = nil
-        loadData(method: .city(city))
+        loadData(method: .city(city), makeObserved: true)
+    }
+    
+    func handleRefreshStoredWeather() {
+        citiesWeather.removeAll()
+        loadSavedCities()
     }
     
     func removeError() {
@@ -52,30 +55,58 @@ final class WeatherViewModel: ObservableObject {
 }
 
 extension WeatherViewModel {
-    func loadData(method: WeatherReqestMethod) {
-        self.observedWeather = nil
+    func loadUserWeather(makeObserved: Bool = false) {
+        Task(priority: .medium) {
+            do {
+                guard let location = locationDataManager.locationManager.location else { return }
+                
+                let weather = try await requestWeather(method:.coordinate(
+                    location.coordinate.latitude,
+                    location.coordinate.longitude)
+                )
+                self.userWeather = weather
+                
+                if makeObserved {
+                    self.observedWeather = weather
+                }
+            } catch {
+                self.error = error
+            }
+        }
+    }
+    
+    func loadData(method: WeatherReqestMethod, makeObserved: Bool = false) {
+        if makeObserved {
+            observedWeather = nil
+        }
         
         Task(priority: .medium) {
-            switch method {
-            case .city(let city):
-                do {
+            do {
+                switch method {
+                case .city(let city):
                     let weather = try await requestWeather(method: method)
-                    self.observedWeather = weather
                     self.citiesWeather[city] = weather
-                    print("CITY DATA RECIEVED")
-                } catch {
-                    self.error = error
+                    
+                    if makeObserved {
+                        self.observedWeather = weather
+                    }
+                case .coordinate:
+                    let weather = try await requestWeather(method: method)
+                    self.citiesWeather[weather?.city ?? "User location"] = weather
+                    
+                    if makeObserved {
+                        self.observedWeather = weather
+                    }
                 }
-            case .coordinate:
-                do {
-                    self.observedWeather = try await requestWeather(method: method)
-                    guard let weather = self.observedWeather else { return }
-                    self.citiesWeather[weather.city ?? "User location"] = weather
-                    print("COORDINATES DATA RECIVED")
-                } catch {
-                    self.error = error
-                }
+            } catch {
+                self.error = error
             }
+        }
+    }
+    
+    func loadSavedCities() {
+        for city in cities {
+            loadData(method: .city(city))
         }
     }
 }

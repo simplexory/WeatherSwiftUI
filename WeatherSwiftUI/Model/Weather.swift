@@ -9,6 +9,7 @@ import Foundation
 
 struct Weather: Codable {
     var city: String?
+    var timezone: Int?
     var forecast: [CompleteWeatherListItem]?
     var current: CompleteCurrentWeatherItem?
     
@@ -23,6 +24,7 @@ struct Weather: Codable {
         }else {
             self.current = try CompleteCurrentWeatherItem(currentWeather: currentWeather)
             self.city = currentWeather.name
+            self.timezone = currentWeather.timezone
         }
         
         if let dailyWeatherError = dailyWeather.error {

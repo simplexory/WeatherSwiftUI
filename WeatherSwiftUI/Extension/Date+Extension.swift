@@ -19,6 +19,13 @@ extension Date {
         dateFormatted.dateFormat = "E"
         return dateFormatted.string(from: self)
     }
+    
+    func detailHourFromGMT(timezone: Int = 0) -> String {
+        let dateFormatted = DateFormatter()
+        dateFormatted.timeZone = TimeZone(secondsFromGMT: timezone)
+        dateFormatted.dateFormat = "HH:mm"
+        return dateFormatted.string(from: self)
+    }
 }
 
 

@@ -37,6 +37,7 @@
 		BB1413C22A9B858C006F49F7 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1413C12A9B858C006F49F7 /* Date+Extension.swift */; };
 		BB1413C82A9BBFA5006F49F7 /* CitiesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1413C72A9BBFA5006F49F7 /* CitiesListView.swift */; };
 		BB1413CA2A9BBFB3006F49F7 /* CityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1413C92A9BBFB3006F49F7 /* CityView.swift */; };
+		BB1413CC2A9CD35A006F49F7 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1413CB2A9CD35A006F49F7 /* Errors.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +72,7 @@
 		BB1413C12A9B858C006F49F7 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		BB1413C72A9BBFA5006F49F7 /* CitiesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitiesListView.swift; sourceTree = "<group>"; };
 		BB1413C92A9BBFB3006F49F7 /* CityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityView.swift; sourceTree = "<group>"; };
+		BB1413CB2A9CD35A006F49F7 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,8 +152,8 @@
 			children = (
 				BB1413882A954547006F49F7 /* Reusable */,
 				BB1413BB2A9B7E83006F49F7 /* WeatherView.swift */,
-				BB1413BF2A9B7EDE006F49F7 /* WeatherDetailView.swift */,
 				BB1413C72A9BBFA5006F49F7 /* CitiesListView.swift */,
+				BB1413BF2A9B7EDE006F49F7 /* WeatherDetailView.swift */,
 				BB1413772A95388B006F49F7 /* WeatherSummaryView.swift */,
 				BB1413A92A9A3AF0006F49F7 /* HourlyForecastView.swift */,
 				BB1413B32A9A4976006F49F7 /* DailyForecastView.swift */,
@@ -195,6 +197,7 @@
 			children = (
 				BB1413902A95467D006F49F7 /* WeatherEnums.swift */,
 				BB1413A52A9A3271006F49F7 /* Temperature.swift */,
+				BB1413CB2A9CD35A006F49F7 /* Errors.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 				BB1413AA2A9A3AF0006F49F7 /* HourlyForecastView.swift in Sources */,
 				BB1413C22A9B858C006F49F7 /* Date+Extension.swift in Sources */,
 				BB1413972A95497A006F49F7 /* WeatherViewModel.swift in Sources */,
+				BB1413CC2A9CD35A006F49F7 /* Errors.swift in Sources */,
 				BB1413B22A9A408C006F49F7 /* ErrorView.swift in Sources */,
 				BB1413A62A9A3271006F49F7 /* Temperature.swift in Sources */,
 				BB1413B02A9A3ED4006F49F7 /* CacheAsyncImage.swift in Sources */,

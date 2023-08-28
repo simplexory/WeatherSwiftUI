@@ -16,6 +16,7 @@ struct CurrentWeather: Codable {
     let cod: Int
     let message: String?
     let visibility: Int?
+    let timezone: Int
     
     var error: Int? {
         get {

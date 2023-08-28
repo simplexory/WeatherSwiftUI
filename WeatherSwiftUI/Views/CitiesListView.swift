@@ -26,7 +26,7 @@ struct CitiesListView: View {
                         .disableAutocorrection(true)
                         .onSubmit {
                             showingDetail.toggle()
-                            viewModel.loadData(method: .city(searchFieldText))
+                            viewModel.loadData(method: .city(searchFieldText), makeObserved: true)
                         }.fullScreenCover(isPresented: $showingDetail) {
                             WeatherView(isShowingModal: true)
                         }
@@ -35,16 +35,27 @@ struct CitiesListView: View {
                     .padding(.bottom, 10)
                     
                     VStack {
-                        ForEach(0..<11) { _ in
-                            CityView()
-                                .padding(.bottom, 5)
+                        ForEach(viewModel.cities, id: \.self) { cityName in
+                            if viewModel.citiesWeather[cityName] != nil {
+                                CityView(viewModel: CityView.ViewModel(
+                                    name: viewModel.citiesWeather[cityName]?.city ?? "Loading...",
+                                    time: Date().detailHourFromGMT(timezone: viewModel.citiesWeather[cityName]?.timezone ?? 0),
+                                    temperature: viewModel.citiesWeather[cityName]?.current?.temperature ?? .C(0),
+                                    minTemp: viewModel.citiesWeather[cityName]?.current?.minTemperature ?? .C(0),
+                                    maxTemp: viewModel.citiesWeather[cityName]?.current?.maxTemperature ?? .C(0),
+                                    condition: viewModel.citiesWeather[cityName]?.current?.condition ?? ""
+                                ))
+                            } else {
+                                LoadingDataView()
+                            }
                         }
                     }
-                    
-                    
                 }
             }
             .navigationTitle(Text("Weather"))
+            .refreshable {
+                viewModel.handleRefreshStoredWeather()
+            }
         }
     }
 }
@@ -52,6 +63,8 @@ struct CitiesListView: View {
 struct CitiesListView_Previews: PreviewProvider {
     static var previews: some View {
             CitiesListView().environmentObject({ () -> WeatherViewModel in
+                let cities = ["Paris", "London", "Vitebsk", "Minsk", "Moscow"]
+                
                 let viewModel = WeatherViewModel(mock: true)
                 viewModel.citiesWeather["Paris"] = Weather(
                     mockCurrentWeather: previewCurrentWeather,
@@ -77,6 +90,8 @@ struct CitiesListView_Previews: PreviewProvider {
                     mockCurrentWeather: previewCurrentWeather,
                     mockDailyWeather: previewDailyWeather
                 )
+                
+                viewModel.cities = cities
                 return viewModel
             } () ).preferredColorScheme(.dark)
     }
