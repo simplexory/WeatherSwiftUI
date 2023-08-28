@@ -31,8 +31,6 @@ struct HourlyForecastView: View {
                                 .fontWeight(.semibold)
                                 .padding(.vertical, 2)
                             
-                            Spacer()
-                            
                             CacheAsyncImage(
                                 url: snapshot.imageURL
                             ) { phase in

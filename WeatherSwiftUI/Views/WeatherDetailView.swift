@@ -47,18 +47,23 @@ struct WeatherDetailView: View {
     var body: some View {
         ScrollView {
             VStack {
-                WeatherSummaryView(viewModel: weatherSummaryViewModel)
-                    .padding(.top, 20)
-                    .padding(.bottom, 30)
                 
-                HourlyForecastView(viewModel: hourlyForecastViewModel)
-                
-                DailyForecastView(viewModel: dailyForecastViewModel)
             }
-            .padding(.horizontal, 10)
+            .padding(.leading, 15)
+            .padding(.trailing, 15)
+            
+            WeatherSummaryView(viewModel: weatherSummaryViewModel)
+                .padding(.bottom, 30)
+            
+            HourlyForecastView(viewModel: hourlyForecastViewModel)
+            
+            DailyForecastView(viewModel: dailyForecastViewModel)
         }
         .background(Color.black)
         .preferredColorScheme(.dark)
+        .refreshable {
+            viewModel.handleRefresh()
+        }
     }
 }
 
@@ -70,6 +75,14 @@ struct WeatherDetailView_Previews: PreviewProvider {
         
                 WeatherDetailView().environmentObject({ () -> WeatherViewModel in
                     let viewModel = WeatherViewModel(mock: true)
+                    viewModel.citiesWeather["Paris"] = Weather(
+                        mockCurrentWeather: previewCurrentWeather,
+                        mockDailyWeather: previewDailyWeather
+                    )
+                    viewModel.citiesWeather["London"] = Weather(
+                        mockCurrentWeather: previewCurrentWeather,
+                        mockDailyWeather: previewDailyWeather
+                    )
                     viewModel.observedWeather = Weather(
                         mockCurrentWeather: previewCurrentWeather,
                         mockDailyWeather: previewDailyWeather

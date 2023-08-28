@@ -36,7 +36,6 @@ struct Weather: Codable {
                     self.forecast?.append(try CompleteWeatherListItem(dailyWeatherItem: dw))
                 }
             }
-            
         }
     }
     

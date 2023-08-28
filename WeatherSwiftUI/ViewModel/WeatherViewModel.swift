@@ -39,26 +39,41 @@ final class WeatherViewModel: ObservableObject {
     }
     
     init(mock: Bool = true) {}
+    
+    func handleRefresh() {
+        guard let city = observedWeather?.city else { return }
+        observedWeather = nil
+        loadData(method: .city(city))
+    }
+    
+    func removeError() {
+        self.error = nil
+    }
 }
 
 extension WeatherViewModel {
     func loadData(method: WeatherReqestMethod) {
+        self.observedWeather = nil
+        
         Task(priority: .medium) {
             switch method {
             case .city(let city):
-                guard let _ = citiesWeather[city] else { return }
                 do {
                     let weather = try await requestWeather(method: method)
                     self.observedWeather = weather
                     self.citiesWeather[city] = weather
+                    print("CITY DATA RECIEVED")
                 } catch {
-                    self.error = error // ?????????
+                    self.error = error
                 }
             case .coordinate:
                 do {
                     self.observedWeather = try await requestWeather(method: method)
+                    guard let weather = self.observedWeather else { return }
+                    self.citiesWeather[weather.city ?? "User location"] = weather
+                    print("COORDINATES DATA RECIVED")
                 } catch {
-                    self.error = error //  ?????? need test
+                    self.error = error
                 }
             }
         }
@@ -129,7 +144,7 @@ extension WeatherViewModel {
             
             guard let dailyForecast = dailyForecast,
                   let currentWeather = currentWeather else {
-                throw WeatherFetchError.serverError
+                throw WeatherFetchError.invalidData
             }
             
             let weather = try Weather(currentWeather: currentWeather, dailyWeather: dailyForecast)

@@ -16,7 +16,7 @@ extension Date {
     
     func dayFormatted() -> String {
         let dateFormatted = DateFormatter()
-        dateFormatted.dateFormat = "EEEE"
+        dateFormatted.dateFormat = "E"
         return dateFormatted.string(from: self)
     }
 }

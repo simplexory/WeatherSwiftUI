@@ -26,7 +26,7 @@ struct DailyForecastRowView: View {
             Text(viewModel.dayTime.uppercased())
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .padding(.leading, 10)
+                .padding(.leading, 15)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
             
@@ -54,7 +54,7 @@ struct DailyForecastRowView: View {
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .listRowSeparator(.hidden)
-            .padding(.trailing, 10)
+            .padding(.trailing, 15)
             
             Spacer()
             
