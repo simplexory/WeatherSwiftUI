@@ -16,11 +16,12 @@ final class WeatherViewModel: ObservableObject {
     @Published var error: Error?
     @Published var userWeather: Weather?
     
-    var cities: [String] = ["Moscow", "Paris", "Vitebsk"]
+    var cities = [String]()
     private let apiKey = "66252e3de78861371fa91da79b0a1090"
     private let baseURL = "https://api.openweathermap.org/data/2.5"
     private let weatherURL = "/weather"
     private let forecastURL = "/forecast"
+    private let storageManager = StorageManager.shared
     
     init() {
         loadSavedCities()
@@ -45,12 +46,47 @@ final class WeatherViewModel: ObservableObject {
     }
     
     func handleRefreshStoredWeather() {
-        citiesWeather.removeAll()
         loadSavedCities()
+    }
+    
+    func saveObservedCity() {
+        guard let city = observedWeather?.city else { return }
+        storageManager.saveCity(cityName: city)
+        loadData(method: .city(city))
+    }
+    
+    func removeObservedCity() {
+        guard let city = observedWeather?.city else { return }
+        storageManager.removeCity(cityName: city)
+        citiesWeather[city] = nil
+        loadCities()
+    }
+    
+    func loadSavedCities() {
+        loadCities()
+        
+        for city in cities {
+            if citiesWeather[city] == nil {
+                loadData(method: .city(city))
+            }
+        }
+    }
+    
+    private func loadCities() {
+        let loadedCities = storageManager.loadCities()
+        cities = loadedCities
     }
     
     func removeError() {
         self.error = nil
+    }
+    
+    func removeAllSavedCities() {
+        storageManager.removeAll()
+    }
+    
+    func cityIsSaved(cityName: String) -> Bool {
+        return cities.contains(cityName)
     }
 }
 
@@ -101,12 +137,6 @@ extension WeatherViewModel {
             } catch {
                 self.error = error
             }
-        }
-    }
-    
-    func loadSavedCities() {
-        for city in cities {
-            loadData(method: .city(city))
         }
     }
 }

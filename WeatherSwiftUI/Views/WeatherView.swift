@@ -9,61 +9,66 @@ import SwiftUI
 
 struct WeatherView: View {
     @EnvironmentObject var viewModel: WeatherViewModel
-    @State private var showAlert = false
-    @State var cityIsSaved = false
-    @State private var isPresented = false
-    @State var isShowingModal = false
     @Environment(\.dismiss) var dismiss
+    
+    @State private var showAlert = false
+    @State private var isPresented = false
+    @State var isSaved = false
+    
+    var isShowingModal = false
     
     var body: some View {
         VStack {
-            HStack {
-                if isShowingModal {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: isShowingModal ? "arrow.backward" : "list.bullet")
-                            .resizable()
-                            .frame(width: 30, height: 20)
-                            .foregroundColor(.white)
-                    }
-                } else {
-                    Button {
-                        isPresented.toggle()
-                    } label: {
-                        Image(systemName: isShowingModal ? "arrow.backward" : "list.bullet")
-                            .resizable()
-                            .frame(width: 30, height: 20)
-                            .foregroundColor(.white)
-                    }
-                    .fullScreenCover(isPresented: $isPresented) {
-                        CitiesListView()
-                    }
-                }
-                
-                Spacer()
-                
-                if !cityIsSaved {
-                    Button("+") {
-                        cityIsSaved.toggle()
-                        // do
-                    }
-                    .font(.largeTitle)
-                    .foregroundColor(.white)
-                } else {
-                    Button("✓") {
-                        cityIsSaved.toggle()
-                        // do
-                    }
-                    .font(.largeTitle)
-                    .foregroundColor(.green)
-                }
-            }
-            .padding(.leading, 15)
-            .padding(.trailing, 15)
-            
             if viewModel.observedWeather != nil {
+                HStack {
+                    if isShowingModal {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: isShowingModal ? "arrow.backward" : "list.bullet")
+                                .resizable()
+                                .frame(width: 30, height: 20)
+                                .foregroundColor(.white)
+                        }
+                    } else {
+                        Button {
+                            isPresented.toggle()
+                        } label: {
+                            Image(systemName: isShowingModal ? "arrow.backward" : "list.bullet")
+                                .resizable()
+                                .frame(width: 30, height: 20)
+                                .foregroundColor(.white)
+                        }
+                        .fullScreenCover(isPresented: $isPresented) {
+                            CitiesListView()
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    if !isSaved {
+                        Button("+") {
+                            isSaved.toggle()
+                            viewModel.saveObservedCity()
+                        }
+                        .font(.largeTitle)
+                        .foregroundColor(.white)
+                    } else {
+                        Button("✓") {
+                            isSaved.toggle()
+                            viewModel.removeObservedCity()
+                        }
+                        .font(.largeTitle)
+                        .foregroundColor(.green)
+                    }
+                }
+                .padding(.leading, 15)
+                .padding(.trailing, 15)
+                
                 WeatherDetailView()
+                    .onAppear {
+                        isSaved = viewModel.cityIsSaved(cityName: viewModel.observedWeather?.city ?? "")
+                    }
             } else {
                 LoadingDataView()
             }
@@ -85,7 +90,7 @@ struct WeatherView: View {
     }
 }
 
-struct WelcomeView_Previews: PreviewProvider {
+struct WeatherView_Previews: PreviewProvider {
     static var previews: some View {
         ScrollView {
             HStack {
