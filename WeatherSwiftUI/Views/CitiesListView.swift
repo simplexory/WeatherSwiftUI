@@ -31,11 +31,10 @@ struct CitiesListView: View {
                             } else {
                                 viewModel.loadData(method: .city(searchFieldText), makeObserved: true)
                             }
-                        }.fullScreenCover(isPresented: $showingDetail) {
+                        }.fullScreenCover(isPresented: $showingDetail, onDismiss: {
+                            viewModel.handleRefreshStoredWeather()
+                        }) {
                             WeatherView(isShowingModal: true)
-                                .onDisappear {
-                                    viewModel.handleRefreshStoredWeather()
-                                }
                         }
                     }
                     .padding(.top, 10)

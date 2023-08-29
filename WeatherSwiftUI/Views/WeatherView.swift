@@ -13,7 +13,7 @@ struct WeatherView: View {
     
     @State private var showAlert = false
     @State private var isPresented = false
-    @State var isSaved = false
+    @State private var isSaved = false
     
     var isShowingModal = false
     
@@ -81,11 +81,11 @@ struct WeatherView: View {
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Error"),
-                message: Text(viewModel.error?.localizedDescription ?? "")
+                message: Text(viewModel.error?.localizedDescription ?? ""),
+                dismissButton: Alert.Button.cancel(Text("Cancel"), action: {
+                    dismiss()
+                })
             )
-        }
-        .onSubmit {
-            viewModel.removeError()
         }
     }
 }

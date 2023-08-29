@@ -28,12 +28,15 @@ enum WeatherFetchError: Error, LocalizedError {
 }
 
 enum LocationError: Error, LocalizedError {
+    case locationNotFound
     case locationDenied
     case locationNotDetermined
     case unknown(Error)
     
     var errorDescription: String? {
         switch self {
+        case .locationNotFound:
+            return "City not found"
         case .locationDenied:
             return "Current location data was restricted or denied, please set location permission in settings."
         case .locationNotDetermined:

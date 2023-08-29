@@ -15,8 +15,8 @@ final class WeatherViewModel: ObservableObject {
     @Published var observedWeather: Weather?
     @Published var error: Error?
     @Published var userWeather: Weather?
+    @Published var cities = [String]()
     
-    var cities = [String]()
     private let apiKey = "66252e3de78861371fa91da79b0a1090"
     private let baseURL = "https://api.openweathermap.org/data/2.5"
     private let weatherURL = "/weather"
