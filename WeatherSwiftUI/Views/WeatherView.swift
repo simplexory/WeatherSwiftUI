@@ -83,6 +83,7 @@ struct WeatherView: View {
                 title: Text("Error"),
                 message: Text(viewModel.error?.localizedDescription ?? ""),
                 dismissButton: Alert.Button.cancel(Text("Cancel"), action: {
+                    viewModel.removeError()
                     dismiss()
                 })
             )
