@@ -95,12 +95,12 @@ struct CitiesListView: View {
                     }
                 }
             }
-            .refreshable {
-                viewModel.handleRefreshStoredWeather()
-            }
-            .onAppear {
-                viewModel.handleRefreshStoredWeather()
-            }
+        }
+        .refreshable {
+            viewModel.handleRefreshStoredWeather()
+        }
+        .onAppear {
+            viewModel.handleRefreshStoredWeather()
         }
     }
 }

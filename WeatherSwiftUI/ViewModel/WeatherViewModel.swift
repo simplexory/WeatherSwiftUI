@@ -66,9 +66,7 @@ final class WeatherViewModel: ObservableObject {
         loadCities()
         
         for city in cities {
-            if citiesWeather[city] == nil {
-                loadData(method: .city(city))
-            }
+            loadData(method: .city(city))
         }
     }
     
